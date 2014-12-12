@@ -24,11 +24,9 @@ Image from Dockerfile_
 Configure docker daemon
 =======================
 
-.. note::
+::
 
     172.17.42.1 is default ip address for docker0 interface in ubuntu trusty
-
-::
 
     $ vi /etc/default/docker
     
@@ -57,9 +55,7 @@ Run for production
 Test Rest request with curl
 ---------------------------
 
-.. note::
-
-    use curl -k or --insecure for curl with auto-certificate
+Use curl -k or --insecure for curl with auto-certificate
 
 ::    
 
@@ -130,9 +126,7 @@ For change login/password
 For use external certificate
 ----------------------------
 
-.. warning::
-
-    if you use  "-e FORCE_CONFIG=1" after creating your certificates, your files will be deleted 
+Warning: if you use  "-e FORCE_CONFIG=1" after creating your certificates, your files will be deleted 
 
 1. Generate your certificate with openssl or import your existant certificat::
 
