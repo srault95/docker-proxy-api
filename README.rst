@@ -18,6 +18,10 @@ Build
 Image from Dockerfile_ 
 
 .. code-block:: bash
+
+    $ git clone https://github.com/srault95/docker-proxy-api.git
+    
+    $ cd docker-proxy-api
     
     $ docker build -t radicalspam/docker-proxy-api .
 
@@ -107,9 +111,7 @@ For change SSL parameters
 For change login/password
 -------------------------
 
-.. note::
-
-    Password max length: 8 characters
+Password max length: 8 characters
 
 ::
 
@@ -193,7 +195,7 @@ Access with python
     >>> c.auth = ('docker', 'docker')
     >>> c.ping()
     
-.. note::
+::
 
     For disable SSL warnings from urllib3
     
