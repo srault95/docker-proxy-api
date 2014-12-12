@@ -1,27 +1,28 @@
+===============================
 Nginx Proxy for Docker Rest API
 ===============================
 
-Https secure proxy and auth for docker daemon (Rest API) listen on http://172.17.42.1:4444 (docker0 interface)
+Https secure proxy and auth for Docker_ daemon (Rest API)
 
-Tested with Docker 1.3.1 on Ubuntu 14.04
+Tested with Docker_ 1.3.1 on Ubuntu_ 14.04
 
 Features
---------
+========
 
 - Basic auth http
 - Secure http by SSL certificate
 
 Build
------
+=====
 
-Image from dockerfile/nginx 
+Image from Dockerfile_ 
 
 .. code-block:: bash
     
     $ docker build -t radicalspam/docker-proxy-api .
 
 Configure docker daemon
------------------------
+=======================
 
 .. note::
 
@@ -37,24 +38,24 @@ Configure docker daemon
  
 
 Run
----
+===
 
 Run for testing
-:::::::::::::::
+---------------
 
 .. code-block:: bash
 
     $ docker run -it --rm -p 2375:2375 radicalspam/docker-proxy-api
 
 Run for production
-::::::::::::::::::
+------------------
 
 .. code-block:: bash
 
     $ docker run -d --name docker-proxy -p 2375:2375 radicalspam/docker-proxy-api
     
 Test Rest request with curl
-:::::::::::::::::::::::::::
+---------------------------
 
 .. note::
 
@@ -71,10 +72,10 @@ Test Rest request with curl
     {"Containers":38,"Debug":0,"Driver":"aufs","DriverStatus":[["Root Dir","/home/docker/aufs"],["Dirs","893"]],"ExecutionDriver":"native-0.2","IPv4Forwarding":1,"Images":811,"IndexServerAddress":"https://index.docker.io/v1/","InitPath":"/usr/bin/docker","InitSha1":"","KernelVersion":"3.13.0-39-generic","MemoryLimit":1,"NEventsListener":0,"NFd":16,"NGoroutines":23,"OperatingSystem":"Ubuntu 14.04.1 LTS","SwapLimit":1}
 
 Tips
-----
+====
 
 No port mapping
-:::::::::::::::
+---------------
 
 ::
 
@@ -87,14 +88,14 @@ No port mapping
     
         
 For remplace SSL certificate and password on start contenair
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+------------------------------------------------------------
 
 ::
 
     $ docker run -e FORCE_CONFIG=1 -d --name docker-proxy -p 2375:2375 radicalspam/docker-proxy-api
 
 For change SSL parameters
-:::::::::::::::::::::::::
+-------------------------
 
 ::
 
@@ -108,7 +109,7 @@ For change SSL parameters
       radicalspam/docker-proxy-api
 
 For change login/password
-:::::::::::::::::::::::::
+-------------------------
 
 .. note::
 
@@ -127,7 +128,7 @@ For change login/password
     $ curl -k -u user:password https://127.0.0.1:2375/info
 
 For use external certificate
-::::::::::::::::::::::::::::
+----------------------------
 
 .. warning::
 
@@ -147,7 +148,7 @@ For use external certificate
       radicalspam/docker-proxy-api
 
 For use external password file
-::::::::::::::::::::::::::::::
+------------------------------
 
 1. Create new password file::
 
@@ -164,7 +165,7 @@ For use external password file
     $ curl -k -u user:12345678 https://127.0.0.1:2375/info
 
 Change ip:port address of your docker daemon
-::::::::::::::::::::::::::::::::::::::::::::
+--------------------------------------------
 
 - Copy or edit docker-proxy.conf
 
@@ -178,8 +179,8 @@ Change ip:port address of your docker daemon
       -v /docker-proxy.conf:/etc/nginx/docker-proxy.conf \
       radicalspam/docker-proxy-api
 
-Access With docker-py
----------------------
+Access with python
+==================
 
 - https://github.com/docker/docker-py
 
@@ -207,7 +208,7 @@ Access With docker-py
 
 
 Nginx Logs
-----------
+==========
 
 - Nginx logs redirect to /dev/stdout and /dev/stderr for display in "docker logs CID"
 
@@ -242,25 +243,35 @@ Nginx Logs
         
     
 Todos / Ideas
--------------
+=============
 
 - Documentation en Français
 - Add schema
 - Publish to HUB registry
-- Drone test: https://drone.io/
+- Drone test: Drone_
 - Test with -api-enable-cors
 - Optimisations nginx
 - Configuration for ip address of docker in proxy_pass
 - Add authentication method
 - optionnal ssl and password
-- Implementation of docker-py with auth/ssl
-- docker-py, auth by proxies::
 
-    proxies = {
-        "http": "http://user:pass@10.10.1.10:3128/",
-    }
-    c.REQ(proxies=proxies)
+- Interest of links from this contenair::
+
+    docker run -it --rm --link docker-proxy:proxy ubuntu env
     
-- Use certifi package for pem
-- Use REQUESTS_CA_BUNDLE ?
-- Interest of links from this contenair ?    
+    PROXY_PORT_2375_TCP=tcp://172.17.0.15:2375
+    PROXY_PORT_2375_TCP_ADDR=172.17.0.15
+    PROXY_PORT_2375_TCP_PORT=2375
+    PROXY_PORT_2375_TCP_PROTO=tcp
+    PROXY_NAME=/suspicious_pasteur/proxy
+    PROXY_ENV_DOCKER_USER=docker
+    PROXY_ENV_DOCKER_PASSWORD=docker
+    PROXY_ENV_SSL_COMMON_NAME=localhost
+    PROXY_ENV_SSL_RSA_BIT=4096
+    PROXY_ENV_SSL_DAYS=365
+
+
+.. _Docker: https://www.docker.com/
+.. _Ubuntu: http://www.ubuntu.com/
+.. _Dockerfile: http://dockerfile.github.io/#/nginx
+.. _Drone: https://drone.io/
