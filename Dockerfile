@@ -1,5 +1,7 @@
 FROM dockerfile/nginx
 
+MAINTAINER <stephane.rault@radicalspam.org>
+
 ENV DOCKER_USER docker
 ENV DOCKER_PASSWORD docker
 
