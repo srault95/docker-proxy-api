@@ -6,24 +6,40 @@ Https secure proxy and auth for Docker_ daemon (Rest API)
 
 Tested with Docker_ 1.3.1 on Ubuntu_ 14.04
 
+
+Links
+=====
+
+http://srault95.github.io/docker-proxy-api
+
+https://registry.hub.docker.com/u/srault95/docker-proxy-api/
+
 Features
 ========
 
 - Basic auth http
 - Secure http by SSL certificate
 
+Pull image from registry
+========================
+
+::
+
+    $ docker pull srault95/docker-proxy-api
+
+
 Build
 =====
 
 Image from Dockerfile_ 
 
-.. code-block:: bash
+::
 
     $ git clone https://github.com/srault95/docker-proxy-api.git
     
     $ cd docker-proxy-api
     
-    $ docker build -t radicalspam/docker-proxy-api .
+    $ docker build -t docker-proxy-api .
 
 Configure docker daemon
 =======================
@@ -47,14 +63,14 @@ Run for testing
 
 .. code-block:: bash
 
-    $ docker run -it --rm -p 2375:2375 radicalspam/docker-proxy-api
+    $ docker run -it --rm -p 2375:2375 srault95/docker-proxy-api
 
 Run for production
 ------------------
 
 .. code-block:: bash
 
-    $ docker run -d --name docker-proxy -p 2375:2375 radicalspam/docker-proxy-api
+    $ docker run -d --name docker-proxy -p 2375:2375 srault95/docker-proxy-api
     
 Test Rest request with curl
 ---------------------------
@@ -79,7 +95,7 @@ No port mapping
 
 ::
 
-    $ docker run -d --name docker-proxy radicalspam/docker-proxy-api
+    $ docker run -d --name docker-proxy srault95/docker-proxy-api
     
     $ DOCKER_PROXY=$(docker inspect -f '{{.NetworkSettings.IPAddress}}' docker-proxy)
     
@@ -92,7 +108,7 @@ For remplace SSL certificate and password on start contenair
 
 ::
 
-    $ docker run -e FORCE_CONFIG=1 -d --name docker-proxy -p 2375:2375 radicalspam/docker-proxy-api
+    $ docker run -e FORCE_CONFIG=1 -d --name docker-proxy -p 2375:2375 srault95/docker-proxy-api
 
 For change SSL parameters
 -------------------------
@@ -106,7 +122,7 @@ For change SSL parameters
 
     $ docker run -d --name docker-proxy -p 2375:2375 \
       -e FORCE_CONFIG=1 -e SSL_COMMON_NAME=my_common_name -e SSL_RSA_BIT=2048 -e SSL_DAYS=730 \
-      radicalspam/docker-proxy-api
+      srault95/docker-proxy-api
 
 For change login/password
 -------------------------
@@ -121,7 +137,7 @@ Password max length: 8 characters
 
     $ docker run -d --name docker-proxy -p 2375:2375 \
       -e FORCE_CONFIG=1 -e DOCKER_USER=user -e DOCKER_PASSWORD=password \
-      radicalspam/docker-proxy-api
+      srault95/docker-proxy-api
       
     $ curl -k -u user:password https://127.0.0.1:2375/info
 
@@ -141,7 +157,7 @@ Warning: if you use  "-e FORCE_CONFIG=1" after creating your certificates, your 
 
     $ docker run -d --name docker-proxy -p 2375:2375 \
       -v `pwd`/nginx-certs:/etc/nginx/certs \
-      radicalspam/docker-proxy-api
+      srault95/docker-proxy-api
 
 For use external password file
 ------------------------------
@@ -154,7 +170,7 @@ For use external password file
 
     $ docker run -d --name docker-proxy -p 2375:2375 \
       -v `pwd`/my_passwd_file:/etc/nginx/.passwd \
-      radicalspam/docker-proxy-api
+      srault95/docker-proxy-api
       
 3. Test::      
       
@@ -173,7 +189,7 @@ Change ip:port address of your docker daemon
 
     $ docker run -d --name docker-proxy -p 2375:2375 \
       -v /docker-proxy.conf:/etc/nginx/docker-proxy.conf \
-      radicalspam/docker-proxy-api
+      srault95/docker-proxy-api
 
 Access with python
 ==================
