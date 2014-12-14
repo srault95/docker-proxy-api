@@ -1,0 +1,30 @@
+dev_addr: 0.0.0.0:4000
+docs_dir: docs
+site_dir: site
+site_name: Docker Proxy API
+site_url: http://srault95.github.io/docker-proxy-api
+site_description: Nginx Proxy with Basic auth and SSL for Docker Rest API
+site_author: Stéphane RAULT 
+repo_url: https://github.com/srault95/docker-proxy-api/
+
+# important pour que site/ au lieu de site/index.html
+use_directory_urls: true
+use_absolute_urls: true
+
+theme: mkdocs
+
+pages:
+  - ['index.md', '**HIDDEN**']
+
+#- ['introduction/index.md', '**HIDDEN**']
+
+#theme_dir: ./theme/mkdocs/
+#theme_center_lead: false
+#copyright: Copyright &copy; 2014, Docker, Inc.
+#google_analytics: ['UA-6096819-11', 'docker.io']
+
+#include_search: true
+
+mkdocs_extensions:
+  - mkdocs_autodoc
+   
