@@ -25,8 +25,15 @@ rm -f ${TARGET}/server.csr
 chown root:root ${TARGET}/server.*
 chmod 0400 ${TARGET}/server.*
 
-echo "Password generation..."
+if [ -z "${NO_GEN_PASSWORD}" ]; then
 
-printf "${DOCKER_USER:-docker}:$(openssl passwd -crypt ${DOCKER_PASSWORD:-docker})\n" > /etc/nginx/.passwd
+	if [ ! -e /etc/nginx/.passwd ] || [ -n "${FORCE_CONFIG}" ]; then
+
+		echo "Password generation..."
+
+		printf "${DOCKER_USER:-docker}:$(openssl passwd -crypt ${DOCKER_PASSWORD:-docker})\n" > /etc/nginx/.passwd
+	fi
+
+fi
 
 echo "End configuration."
