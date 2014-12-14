@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Nginx Proxy with Basic auth and SSL for Docker Rest API">
+        <meta name="author" content="Stéphane RAULT">
+        <link rel="canonical" href="http://srault95.github.io/docker-proxy-api/">
+        <link rel="shortcut icon" href="./img/favicon.ico">
+
+        <title>Docker Proxy API</title>
+
+        <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="./css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link href="./css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="./css/highlight.css">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body class="homepage">
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+            <a class="navbar-brand" href=".">Docker Proxy API</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            
+
+            
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                
+                
+                
+                <li>
+                    <a href="https://github.com/srault95/docker-proxy-api/">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+            
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#nginx-proxy-for-docker-rest-api">Nginx Proxy for Docker Rest API</a></li>
+        
+            <li><a href="#features">Features</a></li>
+        
+            <li><a href="#schema">Schema</a></li>
+        
+            <li><a href="#quick-start">Quick Start</a></li>
+        
+            <li><a href="#pull-image-from-registry">Pull image from registry</a></li>
+        
+            <li><a href="#build">Build</a></li>
+        
+            <li><a href="#configure-docker-daemon">Configure docker daemon</a></li>
+        
+            <li><a href="#run-for-testing">Run for testing</a></li>
+        
+            <li><a href="#test-rest-request-with-curl">Test Rest request with curl</a></li>
+        
+            <li><a href="#no-port-mapping">No port mapping</a></li>
+        
+            <li><a href="#for-remplace-ssl-certificate-and-password-on-start-contenair">For remplace SSL certificate and password on start contenair</a></li>
+        
+            <li><a href="#for-change-ssl-parameters">For change SSL parameters</a></li>
+        
+            <li><a href="#for-change-loginpassword">For change login/password</a></li>
+        
+            <li><a href="#for-use-external-certificate">For use external certificate</a></li>
+        
+            <li><a href="#for-use-external-password-file">For use external password file</a></li>
+        
+            <li><a href="#change-ipport-address-of-your-docker-daemon">Change ip:port address of your docker daemon</a></li>
+        
+            <li><a href="#access-with-python">Access with python</a></li>
+        
+            <li><a href="#nginx-logs">Nginx Logs</a></li>
+        
+            <li><a href="#todos-ideas">Todos / Ideas</a></li>
+        
+    
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="nginx-proxy-for-docker-rest-api">Nginx Proxy for Docker Rest API</h1>
+<p><strong>Https secure proxy and auth for <a href="https://www.docker.com/">Docker</a> daemon (Rest API)</strong></p>
+<p>Tested with <a href="https://www.docker.com/">Docker</a> 1.3.1 on <a href="http://www.ubuntu.com/">Ubuntu</a> 14.04</p>
+<ul>
+<li><a href="http://srault95.github.io/docker-proxy-api">http://srault95.github.io/docker-proxy-api</a></li>
+<li><a href="https://registry.hub.docker.com/u/srault95/docker-proxy-api/">https://registry.hub.docker.com/u/srault95/docker-proxy-api/</a></li>
+</ul>
+<h2 id="features">Features</h2>
+<ul>
+<li>Basic auth http</li>
+<li>Secure http by SSL certificate</li>
+</ul>
+<h2 id="schema">Schema</h2>
+<p><img alt="Big picture" src="./img/docker-proxy-api.png" /></p>
+<h2 id="quick-start">Quick Start</h2>
+<ul>
+<li>Transparent installation. No port mapping</li>
+<li>Replace DOCKER_USER and DOCKER_PASSWORD by your values</li>
+</ul>
+<!-- -->
+
+<pre><code>$ docker pull srault95/docker-proxy-api
+
+$ docker run --restart always -d --name docker-proxy -e DOCKER_USER=myuser -e DOCKER_PASSWORD=password srault95/docker-proxy-api
+
+$ DOCKER_PROXY=$(docker inspect -f '{{.NetworkSettings.IPAddress}}' docker-proxy)
+
+$ curl -k https://${DOCKER_PROXY}:2375/_ping
+
+$ curl -k -u myuser:password https://${DOCKER_PROXY}:2375/info
+</code></pre>
+<h2 id="pull-image-from-registry">Pull image from registry</h2>
+<pre><code>$ docker pull srault95/docker-proxy-api
+</code></pre>
+<h2 id="build">Build</h2>
+<p>Image from <a href="http://dockerfile.github.io/#/nginx">Dockerfile</a></p>
+<pre><code>$ git clone https://github.com/srault95/docker-proxy-api.git
+
+$ cd docker-proxy-api
+
+$ docker build -t docker-proxy-api .
+</code></pre>
+<h2 id="configure-docker-daemon">Configure docker daemon</h2>
+<pre><code>172.17.42.1 is default ip address for docker0 interface in ubuntu trusty
+
+$ vi /etc/default/docker
+
+DOCKER_OPTS="-H tcp://172.17.42.1:4444 -H unix:///var/run/docker.sock"
+
+$ service docker reload
+</code></pre>
+<h2 id="run-for-testing">Run for testing</h2>
+<p>``` {.sourceCode .bash}
+$ docker run -it --rm -p 2375:2375 srault95/docker-proxy-api</p>
+<pre><code>
+Run for production
+------------------
+
+``` {.sourceCode .bash}
+$ docker run -d --name docker-proxy -p 2375:2375 srault95/docker-proxy-api
+</code></pre>
+
+<h2 id="test-rest-request-with-curl">Test Rest request with curl</h2>
+<p>Use curl -k or --insecure for curl with auto-certificate</p>
+<pre><code># without authentication (only for _ping)
+$ curl -k https://127.0.0.1:2375/_ping
+OK
+
+# with authentication
+$ curl -k -u docker:docker https://127.0.0.1:2375/info
+{"Containers":38,"Debug":0,"Driver":"aufs","DriverStatus":[["Root Dir","/home/docker/aufs"],["Dirs","893"]],"ExecutionDriver":"native-0.2","IPv4Forwarding":1,"Images":811,"IndexServerAddress":"https://index.docker.io/v1/","InitPath":"/usr/bin/docker","InitSha1":"","KernelVersion":"3.13.0-39-generic","MemoryLimit":1,"NEventsListener":0,"NFd":16,"NGoroutines":23,"OperatingSystem":"Ubuntu 14.04.1 LTS","SwapLimit":1}
+</code></pre>
+<h2 id="no-port-mapping">No port mapping</h2>
+<pre><code>$ docker run -d --name docker-proxy srault95/docker-proxy-api
+
+$ DOCKER_PROXY=$(docker inspect -f '{{.NetworkSettings.IPAddress}}' docker-proxy)
+
+$ curl -k https://${DOCKER_PROXY}:2375/_ping
+OK
+</code></pre>
+<h2 id="for-remplace-ssl-certificate-and-password-on-start-contenair">For remplace SSL certificate and password on start contenair</h2>
+<pre><code>$ docker run -e FORCE_CONFIG=1 -d --name docker-proxy -p 2375:2375 srault95/docker-proxy-api
+</code></pre>
+<h2 id="for-change-ssl-parameters">For change SSL parameters</h2>
+<pre><code># Default values
+SSL_COMMON_NAME=localhost
+SSL_RSA_BIT=4096
+SSL_DAYS=365
+
+$ docker run -d --name docker-proxy -p 2375:2375 \
+  -e FORCE_CONFIG=1 -e SSL_COMMON_NAME=my_common_name -e SSL_RSA_BIT=2048 -e SSL_DAYS=730 \
+  srault95/docker-proxy-api
+</code></pre>
+<h2 id="for-change-loginpassword">For change login/password</h2>
+<p>Password max length: 8 characters</p>
+<pre><code># Default values
+DOCKER_USER=docker
+DOCKER_PASSWORD=docker
+
+$ docker run -d --name docker-proxy -p 2375:2375 \
+  -e FORCE_CONFIG=1 -e DOCKER_USER=user -e DOCKER_PASSWORD=password \
+  srault95/docker-proxy-api
+
+$ curl -k -u user:password https://127.0.0.1:2375/info
+</code></pre>
+<h2 id="for-use-external-certificate">For use external certificate</h2>
+<p>Warning: if you use "-e FORCE_CONFIG=1" after creating your certificates, your files will be deleted</p>
+<ol>
+<li>
+<p>Generate your certificate with openssl or import your existant certificat:</p>
+<pre><code>$ mkdir nginx-certs
+$ openssl genrsa -out nginx-certs/server.key 1024
+$ openssl req -new -newkey rsa:4096 -days 365 -nodes -subj "/C=/ST=/L=/O=/CN=localhost" -keyout nginx-certs/server.key -out nginx-certs/server.csr
+$ openssl x509 -req -days 365 -in nginx-certs/server.csr -signkey nginx-certs/server.key -out nginx-certs/server.crt
+</code></pre>
+</li>
+<li>
+<p>Use docker volume:</p>
+<pre><code>$ docker run -d --name docker-proxy -p 2375:2375 \
+  -v `pwd`/nginx-certs:/etc/nginx/certs \
+  srault95/docker-proxy-api
+</code></pre>
+</li>
+</ol>
+<h2 id="for-use-external-password-file">For use external password file</h2>
+<ol>
+<li>
+<p>Create new password file:</p>
+<pre><code>$ printf "user:$(openssl passwd -crypt 12345678)\n" &gt; my_passwd_file
+</code></pre>
+</li>
+<li>
+<p>Run contenair with volume option:</p>
+<pre><code>$ docker run -e NO_GEN_PASSWORD=1 -d --name docker-proxy -p 2375:2375 \
+  -v `pwd`/my_passwd_file:/etc/nginx/.passwd \
+  srault95/docker-proxy-api
+</code></pre>
+</li>
+<li>
+<p>Test:</p>
+<pre><code>$ curl -k -u user:12345678 https://127.0.0.1:2375/info
+</code></pre>
+</li>
+</ol>
+<h2 id="change-ipport-address-of-your-docker-daemon">Change ip:port address of your docker daemon</h2>
+<ul>
+<li>
+<p>Copy or edit docker-proxy.conf and change value:</p>
+<pre><code>proxy_pass http://172.17.42.1:4444;
+</code></pre>
+</li>
+<li>
+<p>Use docker-proxy.conf in volume:</p>
+<pre><code>$ docker run -d --name docker-proxy -p 2375:2375 \
+  -v /docker-proxy.conf:/etc/nginx/docker-proxy.conf \
+  srault95/docker-proxy-api
+</code></pre>
+</li>
+</ul>
+<h2 id="access-with-python">Access with python</h2>
+<ul>
+<li><a href="https://github.com/docker/docker-py">https://github.com/docker/docker-py</a></li>
+</ul>
+<!-- -->
+
+<pre><code>$ virtualenv docker
+
+$ source docker/bin/activate
+
+$ pip install docker-py
+
+$ python
+&gt;&gt;&gt; import docker
+&gt;&gt;&gt; tls_config = docker.tls.TLSConfig(verify=False)
+&gt;&gt;&gt; c = docker.Client(base_url='https://127.0.0.1:2375', tls=tls_config)
+&gt;&gt;&gt; c.auth = ('docker', 'docker')
+&gt;&gt;&gt; c.ping()
+
+For disable SSL warnings from urllib3
+
+&gt;&gt;&gt; from requests.packages import urllib3
+&gt;&gt;&gt; urllib3.disable_warnings()
+</code></pre>
+<h2 id="nginx-logs">Nginx Logs</h2>
+<ul>
+<li>Nginx logs redirect to /dev/stdout and /dev/stderr for display in "docker logs CID"</li>
+<li>Accès logs on host with json format</li>
+</ul>
+<!-- -->
+
+<pre><code>DOCKER_PROXY_ID=$(docker inspect -f '{{.Id}}' docker-proxy)
+
+cat /var/lib/docker/containers/${DOCKER_PROXY_ID}/${DOCKER_PROXY_ID}-json.log
+
+$ echo /var/lib/docker/containers/${DOCKER_PROXY_ID}/${DOCKER_PROXY_ID}-json.log
+/var/lib/docker/containers/ddda603702be34d99ab5b0a8bdea06bd821ebe4870ef50414063e4417901c532/ddda603702be34d99ab5b0a8bdea06bd821ebe4870ef50414063e4417901c532-json.log
+
+$ python
+&gt;&gt;&gt; import json, pprint
+&gt;&gt;&gt; values = open('/var/lib/docker/containers/ddda603702be34d99ab5b0a8bdea06bd821ebe4870ef50414063e4417901c532/ddda603702be34d99ab5b0a8bdea06bd821ebe4870ef50414063e4417901c532-json.log').readlines()
+
+&gt;&gt;&gt; for value in values: pprint.pprint(json.loads(value))
+...
+{u'log': u'SSL certificate generation...\n',
+ u'stream': u'stdout',
+ u'time': u'2014-12-12T09:56:12.912944973Z'}
+{u'log': u'Password generation...\n',
+ u'stream': u'stdout',
+ u'time': u'2014-12-12T09:56:13.796529889Z'}
+
+&gt;&gt;&gt; for value in values: print json.loads(value)['time']
+...
+2014-12-12T09:56:12.912944973Z
+2014-12-12T09:56:13.796529889Z
+</code></pre>
+<h2 id="todos-ideas">Todos / Ideas</h2>
+<ul>
+<li>Documentation en Français</li>
+<li>Add schema</li>
+<li>Publish to HUB registry</li>
+<li>Drone test: <a href="https://drone.io/">Drone</a></li>
+<li>Test with -api-enable-cors</li>
+<li>Optimisations nginx</li>
+<li>Configuration for ip address of docker in proxy_pass</li>
+<li>Add authentication method</li>
+<li>optionnal ssl and password</li>
+<li>Interest of links from this contenair:<pre><code>$ docker run -it --rm --link docker-proxy:proxy ubuntu env | grep PROXY_PORT
+
+PROXY_PORT_2375_TCP=tcp://172.17.0.15:2375
+PROXY_PORT_2375_TCP_ADDR=172.17.0.15
+PROXY_PORT_2375_TCP_PORT=2375
+PROXY_PORT_2375_TCP_PROTO=tcp
+</code></pre>
+</li>
+</ul>
+</div>
+            
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+
+        
+
+        <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="./js/bootstrap-3.0.3.min.js"></script>
+        <script src="./js/prettify-1.0.min.js"></script>
+        <script src="./js/highlight.pack.js"></script>
+        <script src="./js/base.js"></script>
+    </body>
+</html>
