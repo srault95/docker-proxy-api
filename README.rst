@@ -16,8 +16,8 @@ Features
 - Basic auth http
 - Secure http by SSL certificate
 
-Big image
-=========
+Schema
+======
 
 |Big picture| 
 
