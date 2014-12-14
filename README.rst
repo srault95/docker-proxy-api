@@ -2,23 +2,44 @@
 Nginx Proxy for Docker Rest API
 ===============================
 
-Https secure proxy and auth for Docker_ daemon (Rest API)
+**Https secure proxy and auth for Docker_ daemon (Rest API)**
 
 Tested with Docker_ 1.3.1 on Ubuntu_ 14.04
 
+- http://srault95.github.io/docker-proxy-api
 
-Links
-=====
-
-http://srault95.github.io/docker-proxy-api
-
-https://registry.hub.docker.com/u/srault95/docker-proxy-api/
+- https://registry.hub.docker.com/u/srault95/docker-proxy-api/
 
 Features
 ========
 
 - Basic auth http
 - Secure http by SSL certificate
+
+Big image
+=========
+
+|Big picture| 
+
+Quick Start
+===========
+
+- Transparent installation. No port mapping
+
+- Replace DOCKER_USER and DOCKER_PASSWORD by your values
+
+::
+
+    $ docker pull srault95/docker-proxy-api
+    
+    $ docker run --restart always -d --name docker-proxy -e DOCKER_USER=myuser -e DOCKER_PASSWORD=password srault95/docker-proxy-api
+    
+    $ DOCKER_PROXY=$(docker inspect -f '{{.NetworkSettings.IPAddress}}' docker-proxy)
+    
+    $ curl -k https://${DOCKER_PROXY}:2375/_ping
+    
+    $ curl -k -u myuser:password https://${DOCKER_PROXY}:2375/info
+    
 
 Pull image from registry
 ========================
@@ -55,25 +76,22 @@ Configure docker daemon
     $ service docker reload
  
 
-Run
-===
-
 Run for testing
----------------
+===============
 
 .. code-block:: bash
 
     $ docker run -it --rm -p 2375:2375 srault95/docker-proxy-api
 
 Run for production
-------------------
+==================
 
 .. code-block:: bash
 
     $ docker run -d --name docker-proxy -p 2375:2375 srault95/docker-proxy-api
     
 Test Rest request with curl
----------------------------
+===========================
 
 Use curl -k or --insecure for curl with auto-certificate
 
@@ -87,11 +105,8 @@ Use curl -k or --insecure for curl with auto-certificate
     $ curl -k -u docker:docker https://127.0.0.1:2375/info
     {"Containers":38,"Debug":0,"Driver":"aufs","DriverStatus":[["Root Dir","/home/docker/aufs"],["Dirs","893"]],"ExecutionDriver":"native-0.2","IPv4Forwarding":1,"Images":811,"IndexServerAddress":"https://index.docker.io/v1/","InitPath":"/usr/bin/docker","InitSha1":"","KernelVersion":"3.13.0-39-generic","MemoryLimit":1,"NEventsListener":0,"NFd":16,"NGoroutines":23,"OperatingSystem":"Ubuntu 14.04.1 LTS","SwapLimit":1}
 
-Tips
-====
-
 No port mapping
----------------
+===============
 
 ::
 
@@ -104,14 +119,14 @@ No port mapping
     
         
 For remplace SSL certificate and password on start contenair
-------------------------------------------------------------
+============================================================
 
 ::
 
     $ docker run -e FORCE_CONFIG=1 -d --name docker-proxy -p 2375:2375 srault95/docker-proxy-api
 
 For change SSL parameters
--------------------------
+=========================
 
 ::
 
@@ -125,7 +140,7 @@ For change SSL parameters
       srault95/docker-proxy-api
 
 For change login/password
--------------------------
+=========================
 
 Password max length: 8 characters
 
@@ -142,7 +157,7 @@ Password max length: 8 characters
     $ curl -k -u user:password https://127.0.0.1:2375/info
 
 For use external certificate
-----------------------------
+============================
 
 Warning: if you use  "-e FORCE_CONFIG=1" after creating your certificates, your files will be deleted 
 
@@ -160,7 +175,7 @@ Warning: if you use  "-e FORCE_CONFIG=1" after creating your certificates, your 
       srault95/docker-proxy-api
 
 For use external password file
-------------------------------
+==============================
 
 1. Create new password file::
 
@@ -168,7 +183,7 @@ For use external password file
 
 2. Run contenair with volume option:: 
 
-    $ docker run -d --name docker-proxy -p 2375:2375 \
+    $ docker run -e NO_GEN_PASSWORD=1 -d --name docker-proxy -p 2375:2375 \
       -v `pwd`/my_passwd_file:/etc/nginx/.passwd \
       srault95/docker-proxy-api
       
@@ -177,13 +192,11 @@ For use external password file
     $ curl -k -u user:12345678 https://127.0.0.1:2375/info
 
 Change ip:port address of your docker daemon
---------------------------------------------
+============================================
 
-- Copy or edit docker-proxy.conf
+- Copy or edit docker-proxy.conf and change value::
 
-- Change value::
-
-    proxy_pass http://172.17.42.1:2375;
+    proxy_pass http://172.17.42.1:4444;
     
 - Use docker-proxy.conf in volume::
 
@@ -269,21 +282,18 @@ Todos / Ideas
 
 - Interest of links from this contenair::
 
-    docker run -it --rm --link docker-proxy:proxy ubuntu env
+    $ docker run -it --rm --link docker-proxy:proxy ubuntu env | grep PROXY_PORT    
     
     PROXY_PORT_2375_TCP=tcp://172.17.0.15:2375
     PROXY_PORT_2375_TCP_ADDR=172.17.0.15
     PROXY_PORT_2375_TCP_PORT=2375
     PROXY_PORT_2375_TCP_PROTO=tcp
-    PROXY_NAME=/suspicious_pasteur/proxy
-    PROXY_ENV_DOCKER_USER=docker
-    PROXY_ENV_DOCKER_PASSWORD=docker
-    PROXY_ENV_SSL_COMMON_NAME=localhost
-    PROXY_ENV_SSL_RSA_BIT=4096
-    PROXY_ENV_SSL_DAYS=365
 
 
 .. _Docker: https://www.docker.com/
 .. _Ubuntu: http://www.ubuntu.com/
 .. _Dockerfile: http://dockerfile.github.io/#/nginx
 .. _Drone: https://drone.io/
+
+.. |Big picture| image:: docker-proxy-api.png
+   :alt: Big picture
